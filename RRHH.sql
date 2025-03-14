@@ -198,7 +198,74 @@ SELECT * FROM Cursos WHERE titulo LIKE '%BASES DE DATOS%';
 -- 11. Aumentar el sueldo en un 10% a los empleados que han impartido más de diez cursos (pueden ser de ediciones diferentes),utiliza GROUP BY en la tabla Ediciones para saber qué NIF_Docente ha 
 -- impartido 2 o más cursos. Luego aplica el UPDATE con un sub SELECT de lo anterior.
 
-SELECT NIF_Docente, count(*) as CursosImpartidos
+-- Para que el aumento del salario en un 10% a los empleados que han impartido más de diez cursos sea posible, necesitamos asegurarnos de que la tabla 
+-- Ediciones tenga suficientes registros. A continuación, añadiré más datos a las tablas relevantes (Cursos, Capacitaciones, Ediciones y Empleados) para que el aumento de salario pueda aplicarse.
+
+INSERT INTO Cursos (RefCurso, Titulo, Duracion, Descripcion) VALUES
+(4, 'PROGRAMACIÓN EN PYTHON', 120, 'Curso de programación en Python'),
+(5, 'INTELIGENCIA ARTIFICIAL', 150, 'Fundamentos de IA'),
+(6, 'DESARROLLO WEB', 100, 'Desarrollo de aplicaciones web'),
+(7, 'REDES NEURONALES', 80, 'Introducción a redes neuronales'),
+(8, 'SEGURIDAD INFORMÁTICA', 90, 'Conceptos de seguridad informática'),
+(9, 'CLOUD COMPUTING', 110, 'Introducción a la nube'),
+(10, 'BIG DATA', 130, 'Manejo de grandes volúmenes de datos'),
+(11, 'DEVOPS', 140, 'Prácticas de DevOps'),
+(12, 'BLOCKCHAIN', 70, 'Tecnología Blockchain'),
+(13, 'CIENCIA DE DATOS', 160, 'Fundamentos de ciencia de datos');
+
+INSERT INTO Empleados (NIF, Nombre, Apellido1, Apellido2, FecNacimiento, Salario, Sexo, Firma) VALUES
+('11223344D', 'Ana', 'Ruiz', 'García', '1987-04-12', 2700.00, 'MUJER', 'Firma4'),
+('22334455E', 'Pedro', 'López', 'Martínez', '1992-07-25', 3200.00, 'HOMBRE', 'Firma5'),
+('33445566F', 'Laura', 'Díaz', 'Fernández', '1995-11-30', 2900.00, 'MUJER', 'Firma6');
+
+INSERT INTO Capacitaciones (RefCurso, NIF_Empleado) VALUES
+(4, '11223344D'),
+(5, '22334455E'),
+(6, '33445566F'),
+(7, '11223344D'),
+(8, '22334455E'),
+(9, '33445566F'),
+(10, '11223344D'),
+(11, '22334455E'),
+(12, '33445566F'),
+(13, '11223344D');
+
+INSERT INTO Ediciones (CodEdicion, RefCurso, Fecha, Lugar, Coste, NIF_Docente) VALUES
+(104, 4, '2023-10-05', 'Madrid', 550.00, '11223344D'),
+(105, 5, '2023-10-10', 'Barcelona', 650.00, '22334455E'),
+(106, 6, '2023-10-15', 'Valencia', 500.00, '33445566F'),
+(107, 7, '2023-10-20', 'Sevilla', 480.00, '11223344D'),
+(108, 8, '2023-10-25', 'Zaragoza', 520.00, '22334455E'),
+(109, 9, '2023-11-01', 'Málaga', 530.00, '33445566F'),
+(110, 10, '2023-11-05', 'Bilbao', 540.00, '11223344D'),
+(111, 11, '2023-11-10', 'Alicante', 560.00, '22334455E'),
+(112, 12, '2023-11-15', 'Valladolid', 570.00, '33445566F'),
+(113, 13, '2023-11-20', 'Vigo', 580.00, '11223344D'),
+(114, 4, '2023-11-25', 'Madrid', 590.00, '11223344D'),
+(115, 5, '2023-12-01', 'Barcelona', 600.00, '22334455E'),
+(116, 6, '2023-12-05', 'Valencia', 610.00, '33445566F');
+
+-- Paso 1: Identificar los empleados que han impartido más de 10 cursos
+
+SELECT NIF_Docente, COUNT(*) AS CursosImpartidos
 FROM Ediciones
 GROUP BY NIF_Docente
-HAVING count(*) >= 2;
+HAVING COUNT(*) > 10;
+
+-- Paso 2: Aumentar el salario en un 10% a esos empleados
+
+UPDATE Empleados
+SET Salario = Salario * 1.10
+WHERE NIF IN (
+    SELECT NIF_Docente
+    FROM Ediciones
+    GROUP BY NIF_Docente
+    HAVING COUNT(*) > 10
+);
+
+-- Verificar el resultado
+
+SELECT * FROM Empleados;
+
+-- 12. Eliminar los cursos que no tienen ninguna edición (tiene que haber, al menos una eliminación) 
+a. Emplea NOT IN (SELECT … FROM Ediciones)
