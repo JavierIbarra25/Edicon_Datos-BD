@@ -1,5 +1,6 @@
 -- 1.Crear una base de datos llamada “FORMACION_EMPLEADOS”.
 DROP DATABASE IF EXISTS RRHH;
+
 CREATE DATABASE RRHH 
 	CHARSET utf8 COLLATE utf8_spanish_ci;
 
@@ -8,6 +9,7 @@ USE RRHH;
 -- 2.Crear las tablas o relaciones anteriormente descritas.
 
 -- Creación de la tabla CURSOS
+
 CREATE TABLE Cursos(
 	RefCurso	Numeric(6),
 	Duracion	Numeric(4) NOT NULL,
@@ -137,46 +139,79 @@ DROP COLUMN Nacion
 
 -- 9. Introducir, como mínimo, dos tuplas en cada tabla. Para la tabla Cursos, debes introducir también estas tupla.
 
-INSERT INTO Empleados (NIF, Nombre, Apellido1, Apellido2, FecNacimiento, Salario, Sexo, Firma) 
-VALUES 
+-- Insertar cursos
+INSERT INTO Cursos (RefCurso, Titulo, Duracion, Descripcion) VALUES
+(1, 'GESTIÓN DE BASES DE DATOS', 100, 'GESTIÓN DE BASES DE DATOS'),
+(2, 'SISTEMAS OPERATIVOS', 200, 'IMPLANTACIÓN DE SISTEMAS OPERATIVOS'),
+(3, 'ADMON DE BASES DE DATOS', 60, 'ABD'),
+(4, 'PROGRAMACIÓN EN PYTHON', 120, 'Curso de programación en Python'),
+(5, 'INTELIGENCIA ARTIFICIAL', 150, 'Fundamentos de IA'),
+(6, 'DESARROLLO WEB', 100, 'Desarrollo de aplicaciones web'),
+(7, 'REDES NEURONALES', 80, 'Introducción a redes neuronales'),
+(8, 'SEGURIDAD INFORMÁTICA', 90, 'Conceptos de seguridad informática'),
+(9, 'CLOUD COMPUTING', 110, 'Introducción a la nube'),
+(10, 'BIG DATA', 130, 'Manejo de grandes volúmenes de datos'),
+(11, 'DEVOPS', 140, 'Prácticas de DevOps');
+
+-- Insertar empleados
+INSERT INTO Empleados (NIF, Nombre, Apellido1, Apellido2, FecNacimiento, Salario, Sexo, Firma) VALUES
 ('12345678A', 'Juan', 'García', 'López', '1985-05-15', 2500.00, 'HOMBRE', 'Firma1'),
 ('87654321B', 'María', 'Martínez', 'Sánchez', '1990-08-22', 3000.00, 'MUJER', 'Firma2'),
-('98765432C', 'Carlos', 'Fernández', 'Gómez', '1988-03-10', 2800.00, 'HOMBRE', 'Firma3');
+('98765432C', 'Carlos', 'Fernández', 'Gómez', '1988-03-10', 2800.00, 'HOMBRE', 'Firma3'),
+('11223344D', 'Ana', 'Ruiz', 'García', '1987-04-12', 2700.00, 'MUJER', 'Firma4');
 
-INSERT INTO Capacitaciones (RefCurso, NIF_Empleado) 
-VALUES 
-(1, '12345678A'),
-(2, '87654321B'),
-(3, '98765432C');
+-- Insertar capacitaciones
+INSERT INTO Capacitaciones (RefCurso, NIF_Empleado) VALUES
+(1, '12345678A'),  -- Juan García
+(1, '11223344D'),
+(2, '87654321B'),  -- María Martínez
+(2, '11223344D'),
+(3, '98765432C'),  -- Carlos Fernández
+(3, '11223344D'), 
+(4, '11223344D'),  -- Ana Ruiz
+(5, '11223344D'),  -- Ana Ruiz
+(6, '11223344D'),  -- Ana Ruiz
+(7, '11223344D'),  -- Ana Ruiz
+(8, '11223344D'),  -- Ana Ruiz
+(9, '11223344D'),  -- Ana Ruiz
+(10, '11223344D'), -- Ana Ruiz
+(11, '11223344D'); -- Ana Ruiz
 
-INSERT INTO Ediciones (CodEdicion, RefCurso, Fecha, Lugar, Coste, NIF_Docente) 
-VALUES 
-(101, 1, '2023-10-01', 'Madrid', 500.00, '12345678A'),
-(102, 2, '2023-11-01', 'Barcelona', 600.00, '87654321B'),
-(103, 3, '2023-12-01', 'Valencia', 450.00, '98765432C'),
-(106, 2, '2024-10-01', 'Madrid', 600.00,'12345678A');
+-- Insertar ediciones (asegurando que Ana Ruiz imparta más de 10 cursos)
 
-INSERT INTO Telefonos (NIF_Empleado, Telefono) 
-VALUES 
+INSERT INTO Ediciones (CodEdicion, RefCurso, Fecha, Lugar, Coste, NIF_Docente) VALUES
+(101, 1, '2023-10-01', 'Madrid', 500.00, '11223344D'),  -- Ana Ruiz
+(102, 2, '2023-11-01', 'Barcelona', 600.00, '11223344D'), -- Ana Ruiz
+(103, 3, '2023-12-01', 'Valencia', 450.00, '11223344D'), -- Ana Ruiz
+(104, 4, '2023-10-05', 'Madrid', 550.00, '11223344D'),  -- Ana Ruiz
+(105, 5, '2023-10-10', 'Barcelona', 650.00, '11223344D'), -- Ana Ruiz
+(106, 6, '2023-10-15', 'Valencia', 500.00, '11223344D'), -- Ana Ruiz
+(107, 7, '2023-10-20', 'Sevilla', 480.00, '11223344D'), -- Ana Ruiz
+(108, 8, '2023-10-25', 'Zaragoza', 520.00, '11223344D'), -- Ana Ruiz
+(109, 9, '2023-11-01', 'Málaga', 530.00, '11223344D'), -- Ana Ruiz
+(110, 10, '2023-11-05', 'Bilbao', 540.00, '11223344D'), -- Ana Ruiz
+(111, 11, '2023-11-10', 'Alicante', 560.00, '11223344D'), -- Ana Ruiz
+(114, 1, '2023-11-25', 'Madrid', 590.00, '12345678A'), -- Juan García
+(115, 2, '2023-12-01', 'Barcelona', 600.00, '87654321B'), -- María Martínez
+(116, 3, '2023-12-05', 'Valencia', 610.00, '98765432C'); -- Carlos Fernández
+
+-- Insertar teléfonos
+INSERT INTO Telefonos (NIF_Empleado, Telefono) VALUES
 ('12345678A', '600123456'),
 ('87654321B', '600654321'),
 ('98765432C', '600987654');
 
-INSERT INTO Prerrequisitos (RefCursoARealizar, RefCursoRequisito, Tipo) 
-VALUES 
+-- Insertar prerrequisitos
+INSERT INTO Prerrequisitos (RefCursoARealizar, RefCursoRequisito, Tipo) VALUES
 (2, 1, 'OBLIGATORIO'),
 (3, 1, 'ACONSEJABLE'),
 (3, 2, 'OBLIGATORIO');
 
-INSERT INTO Matriculaciones (NIF_Alumno, CodEdicion) 
-VALUES 
-('12345678A', 101),
-('87654321B', 102),
-('98765432C', 103);
-
-INSERT INTO Cursos VALUES (1, 'GESTIÓN DE BASES DE DATOS', 100, 'GESTIÓN DE BASES DE DATOS');
-INSERT INTO Cursos VALUES (2, 'SISTEMAS OPERATIVOS', 200, 'IMPLANTACIÓN DE SISTEMAS OPERATIVOS');
-INSERT INTO Cursos VALUES (3, 'ADMON DE BASES DE DATOS', 60, 'ABD');
+-- Insertar matriculaciones
+INSERT INTO Matriculaciones (NIF_Alumno, CodEdicion) VALUES
+('12345678A', 101),  -- Juan García en edición 101
+('87654321B', 102),  -- María Martínez en edición 102
+('98765432C', 103);  -- Carlos Fernández en edición 103
 
 -- Verificar las tuplas en la tabla Cursos
 SELECT * FROM Cursos;
@@ -198,58 +233,11 @@ SELECT * FROM Cursos WHERE titulo LIKE '%BASES DE DATOS%';
 -- 11. Aumentar el sueldo en un 10% a los empleados que han impartido más de diez cursos (pueden ser de ediciones diferentes),utiliza GROUP BY en la tabla Ediciones para saber qué NIF_Docente ha 
 -- impartido 2 o más cursos. Luego aplica el UPDATE con un sub SELECT de lo anterior.
 
--- Para que el aumento del salario en un 10% a los empleados que han impartido más de diez cursos sea posible, necesitamos asegurarnos de que la tabla 
--- Ediciones tenga suficientes registros. A continuación, añadiré más datos a las tablas relevantes (Cursos, Capacitaciones, Ediciones y Empleados) para que el aumento de salario pueda aplicarse.
-
-INSERT INTO Cursos (RefCurso, Titulo, Duracion, Descripcion) VALUES
-(4, 'PROGRAMACIÓN EN PYTHON', 120, 'Curso de programación en Python'),
-(5, 'INTELIGENCIA ARTIFICIAL', 150, 'Fundamentos de IA'),
-(6, 'DESARROLLO WEB', 100, 'Desarrollo de aplicaciones web'),
-(7, 'REDES NEURONALES', 80, 'Introducción a redes neuronales'),
-(8, 'SEGURIDAD INFORMÁTICA', 90, 'Conceptos de seguridad informática'),
-(9, 'CLOUD COMPUTING', 110, 'Introducción a la nube'),
-(10, 'BIG DATA', 130, 'Manejo de grandes volúmenes de datos'),
-(11, 'DEVOPS', 140, 'Prácticas de DevOps'),
-(12, 'BLOCKCHAIN', 70, 'Tecnología Blockchain'),
-(13, 'CIENCIA DE DATOS', 160, 'Fundamentos de ciencia de datos');
-
-INSERT INTO Empleados (NIF, Nombre, Apellido1, Apellido2, FecNacimiento, Salario, Sexo, Firma) VALUES
-('11223344D', 'Ana', 'Ruiz', 'García', '1987-04-12', 2700.00, 'MUJER', 'Firma4'),
-('22334455E', 'Pedro', 'López', 'Martínez', '1992-07-25', 3200.00, 'HOMBRE', 'Firma5'),
-('33445566F', 'Laura', 'Díaz', 'Fernández', '1995-11-30', 2900.00, 'MUJER', 'Firma6');
-
-INSERT INTO Capacitaciones (RefCurso, NIF_Empleado) VALUES
-(4, '11223344D'),
-(5, '22334455E'),
-(6, '33445566F'),
-(7, '11223344D'),
-(8, '22334455E'),
-(9, '33445566F'),
-(10, '11223344D'),
-(11, '22334455E'),
-(12, '33445566F'),
-(13, '11223344D');
-
-INSERT INTO Ediciones (CodEdicion, RefCurso, Fecha, Lugar, Coste, NIF_Docente) VALUES
-(104, 4, '2023-10-05', 'Madrid', 550.00, '11223344D'),
-(105, 5, '2023-10-10', 'Barcelona', 650.00, '22334455E'),
-(106, 6, '2023-10-15', 'Valencia', 500.00, '33445566F'),
-(107, 7, '2023-10-20', 'Sevilla', 480.00, '11223344D'),
-(108, 8, '2023-10-25', 'Zaragoza', 520.00, '22334455E'),
-(109, 9, '2023-11-01', 'Málaga', 530.00, '33445566F'),
-(110, 10, '2023-11-05', 'Bilbao', 540.00, '11223344D'),
-(111, 11, '2023-11-10', 'Alicante', 560.00, '22334455E'),
-(112, 12, '2023-11-15', 'Valladolid', 570.00, '33445566F'),
-(113, 13, '2023-11-20', 'Vigo', 580.00, '11223344D'),
-(114, 4, '2023-11-25', 'Madrid', 590.00, '11223344D'),
-(115, 5, '2023-12-01', 'Barcelona', 600.00, '22334455E'),
-(116, 6, '2023-12-05', 'Valencia', 610.00, '33445566F');
-
 -- Paso 1: Identificar los empleados que han impartido más de 10 cursos
 
-SELECT NIF_Docente, COUNT(*) AS CursosImpartidos
-FROM Ediciones
-GROUP BY NIF_Docente
+SELECT e.NIF_Docente, COUNT(*) AS CursosImpartidos
+FROM Ediciones e
+GROUP BY e.NIF_Docente
 HAVING COUNT(*) > 10;
 
 -- Paso 2: Aumentar el salario en un 10% a esos empleados
@@ -257,15 +245,111 @@ HAVING COUNT(*) > 10;
 UPDATE Empleados
 SET Salario = Salario * 1.10
 WHERE NIF IN (
-    SELECT NIF_Docente
-    FROM Ediciones
-    GROUP BY NIF_Docente
+    SELECT e.NIF_Docente
+    FROM Ediciones e
+    GROUP BY e.NIF_Docente
     HAVING COUNT(*) > 10
 );
 
--- Verificar el resultado
+-- Verificar el resultado, Ana Ruiz con 11 cursos ha aumentado de 2.700 a 2.970
 
 SELECT * FROM Empleados;
 
 -- 12. Eliminar los cursos que no tienen ninguna edición (tiene que haber, al menos una eliminación) 
-a. Emplea NOT IN (SELECT … FROM Ediciones)
+
+-- Insertar un curso sin edición (si no existe)
+INSERT INTO Cursos (RefCurso, Titulo, Duracion, Descripcion) 
+VALUES (12, 'CURSO SIN EDICIÓN', 50, 'Este curso no tiene ediciones asociadas');
+
+-- Eliminar cursos sin ediciones
+DELETE FROM Cursos
+WHERE RefCurso NOT IN (SELECT RefCurso FROM Ediciones);
+
+-- Verificar que el curso sin edición ha sido eliminado
+SELECT * FROM Cursos;
+
+-- 13. Aumentar el sueldo en un 15% a los empleados que han impartido cursos en cuyo título aparece “BASES DE DATOS”. (tiene que haber al menos una actualización) 
+
+-- Paso 1: Identificar los NIF_Docente que han impartido este curso con un SELECT de dos tablas (Cursos y Ediciones) y un LIKE
+
+SELECT NIF, Nombre, Salario
+FROM Empleados
+WHERE NIF IN (
+    SELECT e.NIF_Docente
+    FROM Ediciones e
+    inner JOIN Cursos c ON e.RefCurso = c.RefCurso
+    WHERE c.Titulo LIKE '%BASES DE DATOS%'
+);
+
+
+-- Paso 2: Aplicar UPDATE con un WHERE NIF IN (SELECT de lo anterior)
+UPDATE Empleados
+SET Salario = Salario * 1.15
+WHERE NIF IN (
+    SELECT e.NIF_Docente
+    FROM Ediciones e
+    INNER JOIN Cursos c ON e.RefCurso = c.RefCurso
+    WHERE c.Titulo LIKE '%BASES DE DATOS%'
+);
+
+-- Verificar el resultado
+SELECT NIF, Nombre, Salario
+FROM Empleados
+WHERE NIF IN (
+    SELECT e.NIF_Docente
+    FROM Ediciones e
+    INNER JOIN Cursos c ON e.RefCurso = c.RefCurso
+    WHERE c.Titulo LIKE '%BASES DE DATOS%'
+);
+
+
+-- 14. Eliminar los cursos que en estos 10 años (WHERE Fecha >='2023-03-01' AND Fecha <= '2024-03-01') no se han celebrado ninguna edición. (puede no haber ninguna eliminación) 
+
+-- a. Identifica los cursos con ediciones en esas fechas
+
+SELECT e.RefCurso
+FROM Ediciones e
+WHERE e.Fecha >= '2023-03-01' AND e.Fecha <= '2024-03-01';
+
+-- b. Elimínalos con NOT IN (SELECT de lo anterior)
+
+DELETE FROM Cursos
+WHERE RefCurso NOT IN (
+    SELECT e.RefCurso
+    FROM Ediciones e
+    WHERE e.Fecha >= '2023-03-01' AND e.Fecha <= '2024-03-01'
+);
+
+-- Como no teníamos ningún curso fuera de esos años la tabla no cambiará
+
+SELECT * FROM Cursos;
+
+-- 15. Aumentar un 10% la duración del curso en que más alumnos se han matriculado. (tiene que haber al menos una actualización). 
+
+-- a. Crea una vista de la siguiente manera CREATE VIEW V_CursoMatriculados (RefCurso, numMatriculados) AS
+-- SELECT RefCurso, Count(*)
+-- FROM Matriculaciones M, Ediciones E
+-- WHERE M.CodEdicion = E.CodEdicion
+-- GROUP BY RefCurso;
+
+CREATE VIEW V_CursoMatriculados (RefCurso, numMatriculados) AS 
+SELECT RefCurso, Count(*)
+FROM Matriculaciones M, Ediciones E
+WHERE M.CodEdicion = E.CodEdicion
+GROUP BY RefCurso;
+
+SELECT * FROM V_CursoMatriculados;
+
+-- b. Utiliza MAX(numMatriculados)
+
+UPDATE Cursos 
+SET Duracion = Duracion * 1.1
+WHERE RefCurso IN (
+    SELECT RefCurso 
+    FROM V_CursoMatriculados
+    WHERE numMatriculados = (
+        SELECT MAX(numMatriculados) 
+        FROM V_CursoMatriculados
+    )
+    AND RefCurso IN (SELECT DISTINCT RefCurso FROM Ediciones)
+);
