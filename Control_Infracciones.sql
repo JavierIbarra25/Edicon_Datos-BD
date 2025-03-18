@@ -205,7 +205,7 @@ limit 1;
 
 -- 16. Eliminar todas las tablas.
 
+drop table multas;
 drop table agentes;
 drop table infracciones;
-drop table multas;
 drop table vehiculos;
