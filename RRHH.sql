@@ -342,14 +342,11 @@ SELECT * FROM V_CursoMatriculados;
 
 -- b. Utiliza MAX(numMatriculados)
 
-UPDATE Cursos 
-SET Duracion = Duracion * 1.1
+UPDATE Cursos
+SET Duracion = Duracion * 1.10
 WHERE RefCurso IN (
     SELECT RefCurso 
     FROM V_CursoMatriculados
-    WHERE numMatriculados = (
-        SELECT MAX(numMatriculados) 
-        FROM V_CursoMatriculados
-    )
-    AND RefCurso IN (SELECT DISTINCT RefCurso FROM Ediciones)
+    WHERE numMatriculados = (SELECT MAX(numMatriculados) FROM V_CursoMatriculados)
 );
+
