@@ -1,3 +1,11 @@
+-- Creación de la base de datos
+DROP DATABASE IF EXISTS Employees;
+CREATE DATABASE Employees CHARACTER SET utf8mb4 COLLATE utf8mb4_spanish_ci;
+
+USE Employees;
+
+-- Creación de la tabla
+
 use employees;
 
 drop table employes;
@@ -126,3 +134,125 @@ INSERT INTO employes (EMPLOYEE_ID, FIRST_NAME, LAST_NAME, EMAIL, PHONE_NUMBER, H
 (204,'Hermann','Baer','HBAER','515.123.8888','1987-09-29','PR_REP',10000.00,0.00,101,70),
 (205,'Shelley','Higgins','SHIGGINS','515.123.8080','1987-09-30','AC_MGR',12000.00,0.00,101,110),
 (206,'William','Gietz','WGIETZ','515.123.8181','1987-10-01','AC_ACCOUNT',8300.00,0.00,205,110);
+
+
+-- 1. Incrementar el salario en un 10% para todos los empleados que ganen menos de 3000 €.
+
+select *from employes e
+where e.SALARY < 3000;
+
+update employes e 
+set SALARY = e.SALARY * 1.1
+where e.SALARY < 3000; 
+
+--  2. Elimine todos los empleados cuyo MANAGER_ID es 100 y su DEP_ID = 50.
+
+select *from employes e
+
+delete from employes
+where MANAGER_ID = 100 and DEPARTMENT_ID = 50; 
+
+-- 3. Aumente la comisión en 0.05 para los empleados comerciales (su JOB_ID comienza 
+-- con "SA_") que fueron contratados en agosto de 1987
+
+select *from employes e
+
+update employes e 
+set COMMISSION_PCT = e.COMMISSION_PCT + 0.05
+where e.JOB_ID like 'SA%'
+	and year (HIRE_DATE) = 1987
+	and month (HIRE_DATE) = 8;
+
+-- 4. List the name, surname, telephone number and salary of workers who earn less than 3000€ and their JOB_ID is "ST_CLERK". You must use an alias for each 
+-- column (NOM, LLINATGES, TELEFON and SALARI). The list must be sorted by salary in descending order.
+
+select FIRST_NAME as NAME, LAST_NAME as SURNAME, PHONE_NUMBER as TELEPHONE_NUMBER, SALARY
+from employes e 
+where JOB_ID = 'ST_CLERK'
+    and SALARY < 3000
+order by SALARY desc;
+
+-- 5. List the FIRST_NAME, LAST_NAME and HIRE_DATE of the employees hired between 1987-07-10 and 1987-09-10 of department 50. The result must be 
+-- ordered by the hiring date.
+
+select FIRST_NAME, LAST_NAME, HIRE_DATE
+from employes e 
+WHERE DEPARTMENT_ID = 50
+AND HIRE_DATE BETWEEN TO_DATE('1987-07-10', 'YYYY-MM-DD') 
+    			  AND TO_DATE('1987-09-10', 'YYYY-MM-DD')
+order by HIRE_DATE;
+
+-- 6. Count and show all employees who earn more than € 10,000
+
+select COUNT(*) as EMPLOYEES_COUNT
+from employes e 
+where e.SALARY > 10000;
+
+-- 7. Calculate the sum and average of the employees' salary for each department.
+
+select DEPARTMENT_ID, SUM(SALARY) as TOTAL_SALARY, AVG(SALARY) as AVERAGE_SALARY
+from employes e 
+group by e.DEPARTMENT_ID
+order by e.DEPARTMENT_ID; 
+
+-- 8. Calculate the minimum salary and maximum salary for each type of work excluding
+-- programmers (IT_PROG) and commercial (SA_MAN, SA_REP). Use "NOT IN".
+
+select JOB_ID, MIN(SALARY) AS MIN_SALARY, MAX(SALARY) AS MAX_SALARY
+from employes e 
+where e.JOB_ID not in ('IT_PROG', 'SA_MAN', 'SA_REP')
+group by JOB_ID;
+
+-- 9. List the jobs whose average salary is higher than 5000€ ordered by the average salary.
+
+select JOB_ID, AVG(SALARY) as AVERAGE_SALARY
+from employes e 
+group by JOB_ID
+having AVG(SALARY) > 5000
+order by AVERAGE_SALARY desc;
+
+-- 10. Empleado con el salario más alto.
+
+select FIRST_NAME, LAST_NAME, SALARY
+from employes e 
+where SALARY = (select MAX(SALARY) from employes e2);
+
+-- Y con el salario más bajo. (intenta un SELECT que de ambos, el más bajo y el más alto)
+
+select FIRST_NAME, LAST_NAME, SALARY
+from employes e
+where SALARY = (select MAX(SALARY) from employes e2)
+or 	  SALARY = (select MIN(SALARY) from employes e2);
+
+-- Y empleados cuyo salario coincide con la media de salarios de todos los empleados.
+
+select FIRST_NAME, LAST_NAME, SALARY
+from employes e 
+WHERE SALARY = (SELECT AVG(SALARY) FROM employes e2);
+
+-- ¿Cuántos empleados tienen un salario mayor que la media? ¿Quiénes son?
+
+select COUNT(*) as NUM_EMPLEADOS_MAYOR_MEDIA
+from employes e 
+WHERE SALARY > (SELECT AVG(SALARY) FROM employes e2);
+
+select COUNT(*) as FIRST_NAME, LAST_NAME, SALARY
+from employes e 
+WHERE SALARY > (SELECT AVG(SALARY) FROM employes e2);
+
+-- ¿cuántos menor que la media? ¿Quiénes son?
+
+select COUNT(*) as NUM_EMPLEADOS_MAYOR_MEDIA
+from employes e 
+WHERE SALARY < (SELECT AVG(SALARY) FROM employes e2);
+
+select COUNT(*) as FIRST_NAME, LAST_NAME, SALARY
+from employes e 
+WHERE SALARY < (SELECT AVG(SALARY) FROM employes e2);
+
+-- 11. Suma y promedio de los salarios de cada JOB_ID
+
+select JOB_ID, SUM(SALARY) as TOTAL_SALARY, AVG(SALARY) as AVERAGE_SALARY
+from employes e 
+group by e.JOB_ID 
+order by e.JOB_ID; 
