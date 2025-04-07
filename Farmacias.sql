@@ -251,21 +251,25 @@ HAVING Count(DISTINCT F.CodFarmacia)=(SELECT Count(*)FROM Farmacias WHERE Provin
 
 -- 16. Hallar el valor de la mercancía repartida por “Luis García López”
 
+select SUM(r.Cantidad * m.Precio) as Valor_Total_Mercancia
+from repartos r 
+inner join repartidores r2 on r.NIF_Repartidor = r2.NIF
+inner join Medicamentos m on  r.CodMedicamento = m.CodMedicamento
+where r2.Nombre = 'Luis'
+and r2.Apellido1 = 'García'
+and r2.Apellido2 = 'López';
 
 
+-- 17. Hallar el nombre del medicamento del que más unidades se han vendido. Pista:
 
+CREATE VIEW V_Medic_Unidades (CodMedicamento, Unidades) AS
+SELECT CodMedicamento,SUM(Cantidad)
+FROM Repartos
+GROUP BY CodMedicamento;
 
+select*from v_medic_unidades vmu;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+select Nombre, vmu.Unidades
+from medicamentos m  
+inner join v_medic_unidades vmu on m.CodMedicamento = vmu.CodMedicamento
+where Unidades = (select MAX(Unidades) from v_medic_unidades);
