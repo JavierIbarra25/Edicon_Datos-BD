@@ -546,5 +546,38 @@ LIMIT 1;
 
 -- Create a new view with ALL employees (employees + managers)
 
+create or replace view employees.current_salary_all_employees as
+select * from employees.current_salary_emp
+union
+select * from employees.current_salary_manager;
+
+-- Calculate the total payroll (anual payroll) for all employees
+
+select sum(salary) as total_annual_payroll
+from employees.current_salary_all_employees;
+
+-- Calculate the payroll for each department (anual payroll) for all employees
+
+select dept_no, dept_name, sum(salary) as dept_annual_payroll
+from employees.current_salary_all_employees
+group by dept_no, dept_name
+order by dept_annual_payroll desc;
+
+-- Most costly department for all employees
+
+select dept_no, dept_name, sum(salary) as dept_annual_payroll
+from employees.current_salary_all_employees
+group by dept_no, dept_name
+order by dept_annual_payroll desc
+limit 1;
+
+-- Least costly department for all employees
+
+select dept_no, dept_name, sum(salary) as dept_annual_payroll
+from employees.current_salary_all_employees
+group by dept_no, dept_name
+order by dept_annual_payroll asc
+limit 1;
+
 
 
