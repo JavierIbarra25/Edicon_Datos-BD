@@ -1,3 +1,4 @@
+
 -- ----------------------------------------------------------------------------------------------------------------------------------
 -- CESUR  BASES DE DATOS 2023/24 2024/25
 -- Entrega Tema 4  Realización de Consultas 
@@ -349,6 +350,38 @@ INSERT INTO `rige` VALUES (1,1,1,'2015-06-21',NULL,'PP'),
 
 select * from rige r ;
 
+
+-- 1. Obtener los municipios de la comarca en los que se incluye el municipio de Ampuero que tienen una superficie entre 30 km2 y 70 km2 y con excepción de 
+-- ese municipio de Ampuero.
+
+ -- Cuando sabes el código exacto de Ampuero 
+
+select id ,nombre, m.extension , m.comarca 
+from municipios m 
+inner join comarcas c on c.cod_com = m.comarca
+where m.comarca = 'A-A' 
+and m.extension between 30 and 70
+and m.nombre <> 'Ampuero';
+
+-- Cuando buscas por el nombre del municipio (es + lento), no necesitas mirar el código
+
+select m.id, m.nombre, m.extension, m.comarca 
+from municipios m 
+inner join comarcas c on c.cod_com = m.comarca
+where m.comarca = (select comarca from municipios where nombre = 'Ampuero')
+and m.extension between 30 and 70
+and m.nombre <> 'Ampuero';
+
+-- 2. Obtener el nombre, apellidos y partido del alcalde del municipio de Cabezón de la Sal el 2 de julio de 2009.
+
+select p.nombre, p.apellidos, r.partido
+from personas p
+inner join alcaldes a on a.idpers = p.idpers
+inner join rige r on r.alcalde = a.idpers
+inner join municipios m on m.id = r.municipio
+where m.nombre = 'Cabezón de la Sal'
+and r.fini <= '2009-07-02' and r.ffin >= '2009-07-02';
+
 -- 3. Obtener los nombres de los municipios que tienen sus actuales alcaldes registrados junto con el nombre y apellidos
 -- de su actual alcalde y del partido al que pertenece.
 
@@ -371,11 +404,10 @@ and LOWER(l.nombre_loc) like '%peña%';
 -- 5. Obtener las asociaciones a las que pertenece el municipio de Lamasón y cuál 
 -- es la capital de estas asociaciones.
 
-select m2.nombre_manc as Asociaciones, l.nombre_loc as Capital_Asociaciones 
+select m2.nombre_manc as Asociaciones, m2.municipio_sede as Capital_Asociaciones 
 from municipios m 
 inner join incluidos i on i.municipio = id 
 inner join mancomunidades m2 on i.mancomunidad = m2.reg_manc
-inner join localidades l on m2.municipio_sede = l.municipio and m2.num_sede =l.numero
 where m.nombre = 'Lamasón'
 
 -- 6. Obtener, para cada municipio de las regiones de código COC, LIE o SN, cuál es 
@@ -384,10 +416,12 @@ where m.nombre = 'Lamasón'
 select m.nombre as Municipio, l.nombre_loc as Localidad_Mas_Poblada, l.habitantes as Poblacion
 from municipios m 
 join localidades l on l.municipio = m.id
-left join localidades l2 on l.municipio = l2.municipio and l.habitantes < l2.habitantes
 where m.comarca in ('COC', 'LIE', 'SN')
-and l2.municipio is null 
-order by m.nombre;
+and l.habitantes = (
+	select MAX(l2.habitantes)
+	from localidades l2 
+	where l2.municipio = m.id
+);
 
 -- 7. Obtener los nombres de los municipios que no tienen localidad registrada
 
@@ -398,17 +432,94 @@ where l.municipio is null;
 
 -- 8. Obtener la población de cada municipio a partir de la población de sus localidades
 
-select m.nombre, m.poblacion, SUM(l.habitantes) as Poblacion_localidades
+select m.id, m.nombre, SUM(l.habitantes) as Poblacion_Total
 from municipios m 
 inner join localidades l on municipio = id
-group by id
-order by poblacion_localidades desc;
+group by id;
 
--- Crear una VISTA denominada "poblacion" que obtenga la población de cada 
+-- 9.Crear una VISTA denominada "poblacion" que obtenga la población de cada 
 -- municipio a partir de la población de sus localidades. La vista debe tener 3 
 -- columnas: Identificación del municipio, nombre del municipio y la suma de los 
 -- habitantes de las localidades de ese municipio. Mostrar todos los resultados de 
 -- la VISTA con SELECT * FROM poblacion; (Sugerencia: usar un alias para SUM (habitantes))
 
 create or replace view poblacion as
-select 
+select m.id as id_municipio, m.nombre as nombre_municipio, SUM(l.habitantes) as total_habitantes
+from municipios m
+join localidades l on l.municipio = m.id
+group by m.id, m.nombre;
+
+-- Ver resultados
+
+select*from poblacion;
+
+-- 10.Obtenga cuál de los municipios tiene más población. Debe hacerse desde los habitantes de sus localidades. (Consejo: usar la vista anterior para calcular la 
+-- población primero y luego usar esa vista para calcular el MAX)
+
+
+select p.nombre_municipio, p.total_habitantes 
+from poblacion p 
+where p.total_habitantes = (
+	select MAX(total_habitantes)
+	from poblacion
+);
+
+-- 11.Obtener la localidad menos poblada del municipio más poblado. (Sugerencia: usar la vista anterior)
+
+select l.nombre_loc , l.habitantes
+from localidades l
+inner join poblacion p on p.id_municipio = l.municipio 
+where p.total_habitantes = (
+	select MAX(total_habitantes)
+	from poblacion
+)
+and l.habitantes = (
+	select MIN(l2.habitantes)
+	from localidades l2 
+	where l2.municipio = l.municipio
+)
+
+-- 12.Obtener los municipios con mayor densidad poblacional (población / extensión) que el municipio de Ruente. (Sugerencia: usar la vista anterior)
+
+select p.nombre_municipio , p.total_habitantes as densidad_poblacional
+from poblacion p 
+inner join municipios m on m.id = p.id_municipio 
+where total_habitantes > (
+	select total_habitantes
+	from poblacion p2 
+	inner join municipios m2 on m2.id = p2.id_municipio 
+	where p2.nombre_municipio = 'Ruente'
+);
+
+-- 13.Obtener nombres de municipios en los que existan localidades con menos de 10 habitantes.
+
+select m.nombre 
+from municipios m
+inner join localidades l on l.municipio = m.id
+where l.habitantes < 10;
+
+-- 14.Obtener cuántos concejales de cada partido hay en cada municipio.
+
+select m.nombre as municipio, c.partido, COUNT(*) as num_concejales
+from concejales c
+inner join municipios m on m.id = c.municipio
+group by m.nombre, c.partido
+order by m.nombre;
+
+-- 15.Obtener los nombres y extensión de los municipios que colindan con el municipio de Cillorigo de Liébana. (Consejo: usar UNION)
+
+select m.nombre, m.extension 
+from municipios m 
+where m.id in (
+	select l.municmenor
+	from limites l 
+	inner join municipios m2 on l.municmayor = m2.id
+	where m2.nombre = 'Cillorigo de Liébana'
+
+union 
+
+	select l.municmayor
+	from limites l 
+	inner join municipios m2 on m2.id = l.municmayor
+	where m2.nombre = 'Cillorigo de Liébana'
+);
