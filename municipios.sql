@@ -2,24 +2,24 @@
 -- ----------------------------------------------------------------------------------------------------------------------------------
 -- CESUR  BASES DE DATOS 2023/24 2024/25
 -- Entrega Tema 4  Realización de Consultas 
-SELECT * FROM abc;  --  This sentence prevents the execution of all the script by mistake
+-- SELECT * FROM abc;  --  This sentence prevents the execution of all the script by mistake
 /*
 C:\Users\bmesa\OneDrive\Personal\Work\CESUR\0484 Bases de Datos\Material Educativo 0484 Bases de Datos\Tema04 Realización de Consultas\Entregas\Entregas2425\Municipios\municipios_creacion.sql
 */
 -- ----------------------------------------------------------------------------------------------------------------------------------
 
 -- Mostrar mensajes y errores on
-SHOW WARNINGS;
+-- SHOW WARNINGS;
+-- CREATE DATABASE;
 
-﻿-- Creación de la base de datos
+DROP DATABASE IF EXISTS `municipios`; 
 
-DROP SCHEMA IF EXISTS `municipios`; 
 CREATE DATABASE IF NOT EXISTS `municipios` CHARACTER SET utf8mb4 COLLATE utf8mb4_spanish2_ci; 
 COMMIT; 
 
 USE municipios; 
 
-drop table personas; 
+
 CREATE TABLE `personas` (
   `idpers` int NOT NULL AUTO_INCREMENT,
   `nombre` varchar(20) NOT NULL,
@@ -59,7 +59,7 @@ INSERT INTO `personas` VALUES
 -- commit; 
 select * from personas p ; 
 
-drop table alcaldes; 
+
 CREATE TABLE `alcaldes` (
   `idpers` int NOT NULL,
   PRIMARY KEY (`idpers`),
@@ -71,7 +71,7 @@ CREATE TABLE `alcaldes` (
 INSERT INTO `alcaldes` VALUES (1),(2),(3),(4),(5),(6),(7),(26),(27);
 select * from alcaldes; 
 
-drop table comarcas; 
+
 CREATE TABLE `comarcas` (
   `cod_com` char(3) NOT NULL,
   `nombre_com` varchar(25) NOT NULL,
@@ -93,7 +93,7 @@ INSERT INTO `comarcas` VALUES
 ('VPA','Valles Pasiegos',1);
 select * from comarcas c ; 
 
-drop table municipios; 
+
 CREATE TABLE `municipios` (
   `id` smallint NOT NULL,
   `cod_mun` char(3) NOT NULL,
@@ -157,7 +157,7 @@ INSERT INTO `municipios` VALUES
 
 select * from municipios; 
 
-drop table localidades; 
+
 CREATE TABLE `localidades` (
   `municipio` smallint NOT NULL,
   `numero` tinyint NOT NULL,
@@ -211,7 +211,7 @@ INSERT INTO `localidades` VALUES (1,1,'Cóbreces',601),(1,2,'Busta, La',114),(1,
 
 select * from localidades; 
 
-drop table mancomunidades; 
+
 CREATE TABLE `mancomunidades` (
   `reg_manc` char(10) NOT NULL,
   `nombre_manc` varchar(60) NOT NULL,
@@ -230,7 +230,7 @@ INSERT INTO `mancomunidades` VALUES ('0539002','Servicios de los Valles del Saja
 
 select * from mancomunidades ; 
 
-drop table concejales; 
+
 CREATE TABLE `concejales` (
   `idpers` int NOT NULL,
   `partido` varchar(15) NOT NULL,
@@ -250,7 +250,7 @@ INSERT INTO `concejales` VALUES (1,'PP',1),(2,'PP',2),(3,'PRC',3),(4,'PRC',4),(5
 
 select * from concejales ; 
 
-drop table incluidos; 
+
 CREATE TABLE `incluidos` (
   `municipio` smallint NOT NULL,
   `mancomunidad` char(10) NOT NULL,
@@ -276,7 +276,7 @@ INSERT INTO `incluidos` VALUES (12,'0539002','2012-03-12'),(12,'0539016','2010-0
 
 select * from incluidos; 
 
-drop table limites; 
+ 
 CREATE TABLE `limites` (
   `municmayor` smallint NOT NULL,
   `municmenor` smallint NOT NULL,
@@ -297,7 +297,7 @@ INSERT INTO `limites` VALUES (30,2),(4,3),(26,3),(27,3),(6,5),(29,5),(11,6),(4,1
 
 select * from limites; 
 
-drop table personajes; 
+
 CREATE TABLE `personajes` (
   `idpers` int NOT NULL,
   `profesion` varchar(50) NOT NULL,
@@ -320,7 +320,7 @@ INSERT INTO `personajes` VALUES (22,'Conde de Casa Tagle de Trasierra',1,3,'Fue 
 
 select * from personajes ; 
 
-drop table rige; 
+
 CREATE TABLE `rige` (
   `id_rige` int NOT NULL AUTO_INCREMENT,
   `alcalde` int NOT NULL,
@@ -408,7 +408,7 @@ select m2.nombre_manc as Asociaciones, m2.municipio_sede as Capital_Asociaciones
 from municipios m 
 inner join incluidos i on i.municipio = id 
 inner join mancomunidades m2 on i.mancomunidad = m2.reg_manc
-where m.nombre = 'Lamasón'
+where m.nombre = 'Lamasón';
 
 -- 6. Obtener, para cada municipio de las regiones de código COC, LIE o SN, cuál es 
 -- la localidad con mayor población y cuál es su población.
@@ -477,7 +477,7 @@ and l.habitantes = (
 	select MIN(l2.habitantes)
 	from localidades l2 
 	where l2.municipio = l.municipio
-)
+);
 
 -- 12.Obtener los municipios con mayor densidad poblacional (población / extensión) que el municipio de Ruente. (Sugerencia: usar la vista anterior)
 
