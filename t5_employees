@@ -1,0 +1,60 @@
+-- Crear la base de datos
+DROP DATABASE IF EXISTS t5_employees;
+CREATE DATABASE t5_employees CHARACTER SET utf8mb4 COLLATE utf8mb4_spanish2_ci;
+USE t5_employees;
+
+-- Crear tabla DEPARTMENT
+DROP TABLE IF EXISTS `department`;
+CREATE TABLE department (
+  Department_Code SMALLINT UNSIGNED NOT NULL,
+  Department_Name VARCHAR(15) COLLATE utf8mb4_spanish2_ci NOT NULL,
+  City VARCHAR(15) COLLATE utf8mb4_spanish2_ci NOT NULL,
+  PRIMARY KEY (Department_Code)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_spanish2_ci;
+
+-- Insertar datos en DEPARTMENT
+
+INSERT INTO department VALUES
+  (5,'Analysis','Barcelona'),
+  (8,'Programming','Maó'),
+  (10,'Control','Eivissa'),
+  (12,'Direction','Palma'),
+  (15,'Test','La Savina');
+
+-- Crear tabla STAFF
+DROP TABLE IF EXISTS `staff`;
+CREATE TABLE staff (
+  Employee_Code SMALLINT UNSIGNED NOT NULL,
+  Name VARCHAR(25) COLLATE utf8mb4_spanish2_ci NOT NULL,
+  Job VARCHAR(25) COLLATE utf8mb4_spanish2_ci NOT NULL,
+  Salary SMALLINT UNSIGNED NOT NULL,
+  Department_Code SMALLINT UNSIGNED DEFAULT NULL,
+  Start_Date DATE NOT NULL,
+  Superior_Officer SMALLINT UNSIGNED DEFAULT NULL,
+  PRIMARY KEY (Employee_Code),
+  KEY FK_STAFF (Superior_Officer),
+  KEY FK_DEPARTMENT (Department_Code),
+  CONSTRAINT FK_STAFF FOREIGN KEY (Superior_Officer) REFERENCES staff (Employee_Code),
+  CONSTRAINT FK_DEPARTMENT FOREIGN KEY (Department_Code) REFERENCES department (Department_Code)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_spanish2_ci;
+
+-- Insertar datos en STAFF
+
+INSERT INTO staff VALUES 
+  (368,'Almonacid','head',9700,12,'2022-12-20',NULL),           
+  (1190,'Ciriano','Project Manager',8000,10,'2022-09-01',368),  
+  (1003,'Busuioc','analyst',6600,5,'2023-01-12',1190),          
+  (1008,'Carpio','analyst',7800,10,'2023-05-15',368),           
+  (413,'Alonso','analyst',6000,5,'2023-06-01',1008),            
+  (545,'Arnaiz','analyst',5600,5,'2022-11-01',1008),            
+  (552,'Balmaseda','analyst',5500,5,'2023-10-15',1190),         
+  (663,'Barcelo','analyst',6700,5,'2023-01-02',1190),           
+  (765,'Bauza','programmer',3800,8,'2023-06-01',413),          
+  (998,'Belando','programmer',4300,8,'2023-01-01',413),        
+  (1087,'Catalan','programmer',4000,8,'2023-02-01',1003),     
+  (1400,'Sabater','Product Owner',8000,NULL,'2024-02-14',NULL),
+  (1500,'Madrigal','Tester',5000,NULL,'2024-02-14',1400);       
+
+
+select*from department d ;
+select*from staff s  ;
