@@ -71,7 +71,7 @@ proc_insert:BEGIN
     IF p_department_code IS NOT NULL
        AND NOT EXISTS (SELECT 1 FROM department WHERE Department_Code = p_department_code) THEN
         SET o_status = 4;
-        SET o_error_message = 'Error: Department_Code no es válido';
+        SET o_error_message = 'Error: Departamento no existe';
         ROLLBACK; -- fin transacción
         LEAVE proc_insert;
     END IF;
@@ -81,7 +81,7 @@ proc_insert:BEGIN
         SET p_superior_officer = p_employee_code;
     ELSEIF NOT EXISTS (SELECT 1 FROM staff WHERE Employee_Code = p_superior_officer) THEN
         SET o_status = 3;
-        SET o_error_message = 'Error: Superior_Officer no es válido';
+        SET o_error_message = 'Error: Superior Officer no existe';
         ROLLBACK; -- fin transacción
         LEAVE proc_insert;
     END IF;
