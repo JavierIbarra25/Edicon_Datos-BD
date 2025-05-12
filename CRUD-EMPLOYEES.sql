@@ -109,7 +109,7 @@ END$$
     SELECT * FROM staff WHERE Employee_Code = 2000;
 
     -- Falta dato obligatorio (name es NULL)
-    CALL insertar_staff(2001, NULL, 'developer', NULL, 5, NULL, 1008,  @o_status, @o_error_message);
+    CALL insertar_staff(2001, NULL, 'developer', 2000, 5, NULL, 1008,  @o_status, @o_error_message);
     SELECT @o_status AS status, @o_error_message AS message;
 
     -- Employee_Code duplicado
