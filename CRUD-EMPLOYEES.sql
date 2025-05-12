@@ -85,30 +85,31 @@ proc_insert:BEGIN
         ROLLBACK; -- fin transacción
         LEAVE proc_insert;
     END IF;
+
         INSERT INTO staff (Employee_Code, Name, Job, Salary, Department_Code, Start_Date, Superior_Officer)
         VALUES (p_employee_code, p_name, p_job, p_salary, p_department_code, p_start_date, p_superior_officer);
+
+        -- Recuperar los datos recién insertados (incluyendo posibles cambios por triggers)
+        SELECT s* INTO o_employee_code, o_name, o_job, o_salary, o_department_code, o_start_date, o_superior_officer
+        FROM staff 
+        WHERE s.Employee_Code = p_employee_code;
+    
     COMMIT;
 
-    -- Devolver resultados
-    SET o_employee_code = p_employee_code;
-    SET o_name = p_name;
-    SET o_job = p_job;
-    SET o_salary = p_salary;
-    SET o_department_code = p_department_code;
-    SET o_start_date = p_start_date;
-    SET o_superior_officer = p_superior_officer;
+    -- Éxito
     SET o_status = 0;
-    SET o_error_message = 'Info: Se ha insertado la tupla';
+    SET o_error_message = 'Info: Inserción exitosa';
+
 END$$
 
     -- Insercción exitosa
-    CALL insertar_staff(2000,'Nuevo Empleado','developer',5000,5,NULL,1008, @o_status, @o_error_message);
+    CALL insertar_staff(2000, 'Nuevo Empleado', 'developer', NULL, 5, NULL, 1008, @o_status, @o_error_message);
     SELECT @o_status AS status, @o_error_message AS message;
 
     SELECT * FROM staff WHERE Employee_Code = 2000;
 
     -- Falta dato obligatorio (name es NULL)
-    CALL insertar_staff(2001, NULL, 'developer', 5000, 5, NULL, 1008,  @o_status, @o_error_message);
+    CALL insertar_staff(2001, NULL, 'developer', NULL, 5, NULL, 1008,  @o_status, @o_error_message);
     SELECT @o_status AS status, @o_error_message AS message;
 
     -- Employee_Code duplicado
