@@ -49,6 +49,16 @@ proc_insert:BEGIN
     SET TRANSACTION ISOLATION LEVEL REPEATABLE READ;
     START TRANSACTION;
 
+     -- Ajuste de salario
+    IF p_salary IS NULL THEN
+        SET p_salary = (SELECT AVG(Salary) FROM staff);
+    END IF;
+    IF p_salary > (SELECT MAX(Salary) FROM staff) THEN
+        SET p_salary = (SELECT MAX(Salary) FROM staff);
+    ELSEIF p_salary < (SELECT MIN(Salary) FROM staff) THEN
+        SET p_salary = (SELECT MIN(Salary) FROM staff);
+    END IF;
+
     -- Insercción duplicada
     IF p_employee_code IS NOT NULL THEN
         IF EXISTS (SELECT 1 FROM staff WHERE Employee_Code = p_employee_code) THEN
@@ -57,16 +67,6 @@ proc_insert:BEGIN
             ROLLBACK; -- fin transacción
             LEAVE proc_insert;
         END IF;
-    END IF;
-
-    -- Ajuste de salario
-    IF p_salary IS NULL THEN
-        SET p_salary = (SELECT AVG(Salary) FROM staff);
-    END IF;
-    IF p_salary > (SELECT MAX(Salary) FROM staff) THEN
-        SET p_salary = (SELECT MAX(Salary) FROM staff);
-    ELSEIF p_salary < (SELECT MIN(Salary) FROM staff) THEN
-        SET p_salary = (SELECT MIN(Salary) FROM staff);
     END IF;
 
     -- Validar Department_Code
