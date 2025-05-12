@@ -109,7 +109,7 @@ END$$
 
     -- Falta dato obligatorio (name es NULL)
     CALL insertar_staff(2001, NULL, 'developer', 5000, 5, NULL, 1008, @o_ec, @o_name, @o_job, @o_salary, @o_dc, @o_sd, @o_so, @o_status, @o_msg);
-    SELECT @o_status AS status, @o_msg AS message;
+    SELECT @o_status AS status, @o_error_message AS message;
 
 -- =============================================
 -- PROCEDIMIENTO 2: ACTUALIZAR STAFF
