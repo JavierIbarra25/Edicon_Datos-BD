@@ -53,6 +53,7 @@ proc_insert:BEGIN
     IF EXISTS (SELECT 1 FROM staff WHERE Employee_Code = p_employee_code) THEN
         SET o_status = 1;
         SET o_error_message = 'Error: Inserción duplicada';
+        ROLLBACK; -- fin transacción
         LEAVE proc_insert;
     END IF;
 
@@ -71,6 +72,7 @@ proc_insert:BEGIN
        AND NOT EXISTS (SELECT 1 FROM department WHERE Department_Code = p_department_code) THEN
         SET o_status = 4;
         SET o_error_message = 'Error: Department_Code no es válido';
+        ROLLBACK; -- fin transacción
         LEAVE proc_insert;
     END IF;
 
@@ -80,6 +82,7 @@ proc_insert:BEGIN
     ELSEIF NOT EXISTS (SELECT 1 FROM staff WHERE Employee_Code = p_superior_officer) THEN
         SET o_status = 3;
         SET o_error_message = 'Error: Superior_Officer no es válido';
+        ROLLBACK; -- fin transacción
         LEAVE proc_insert;
     END IF;
         INSERT INTO staff (Employee_Code, Name, Job, Salary, Department_Code, Start_Date, Superior_Officer)
