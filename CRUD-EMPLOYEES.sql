@@ -40,6 +40,16 @@ proc_insert:BEGIN
         LEAVE proc_insert;
     END IF;
 
+    -- Fecha de inicio
+    IF p_start_date IS NULL THEN
+        SET p_start_date = CURDATE();
+    END IF;
+
+    -- Transacción con aislamiento REPEATABLE READ para consistencia en lectura
+    SET TRANSACTION ISOLATION LEVEL REPEATABLE READ;
+    START TRANSACTION;
+
+    -- Insercción duplicada
     IF EXISTS (SELECT 1 FROM staff WHERE Employee_Code = p_employee_code) THEN
         SET o_status = 1;
         SET o_error_message = 'Error: Inserción duplicada';
@@ -72,15 +82,6 @@ proc_insert:BEGIN
         SET o_error_message = 'Error: Superior_Officer no es válido';
         LEAVE proc_insert;
     END IF;
-
-    -- Fecha de inicio
-    IF p_start_date IS NULL THEN
-        SET p_start_date = CURDATE();
-    END IF;
-
-    -- Transacción con aislamiento REPEATABLE READ para consistencia en lectura
-    SET TRANSACTION ISOLATION LEVEL REPEATABLE READ;
-    START TRANSACTION;
         INSERT INTO staff (Employee_Code, Name, Job, Salary, Department_Code, Start_Date, Superior_Officer)
         VALUES (p_employee_code, p_name, p_job, p_salary, p_department_code, p_start_date, p_superior_officer);
     COMMIT;
