@@ -50,11 +50,13 @@ proc_insert:BEGIN
     START TRANSACTION;
 
     -- Insercción duplicada
-    IF EXISTS (SELECT 1 FROM staff WHERE Employee_Code = p_employee_code) THEN
-        SET o_status = 1;
-        SET o_error_message = 'Error: Inserción duplicada';
-        ROLLBACK; -- fin transacción
-        LEAVE proc_insert;
+    IF p_employee_code IS NOT NULL THEN
+        IF EXISTS (SELECT 1 FROM staff WHERE Employee_Code = p_employee_code) THEN
+            SET o_status = 1;
+            SET o_error_message = 'Error: Inserción duplicada';
+            ROLLBACK; -- fin transacción
+            LEAVE proc_insert;
+        END IF;
     END IF;
 
     -- Ajuste de salario
