@@ -101,6 +101,16 @@ proc_insert:BEGIN
     SET o_error_message = 'Info: Se ha insertado la tupla';
 END$$
 
+    -- Insercción exitosa
+    CALL insertar_staff(2000,'Nuevo Empleado','developer',5000,5,NULL,1008,@o_employee_code, @o_name, @o_job, @o_salary, @o_department_code, @o_start_date, @o_superior_officer, @o_status, @o_error_message);
+    SELECT @o_status AS status, @o_error_message AS message;
+
+    SELECT * FROM staff WHERE Employee_Code = 2000;
+
+    -- Falta dato obligatorio (name es NULL)
+    CALL insertar_staff(2001, NULL, 'developer', 5000, 5, NULL, 1008, @o_ec, @o_name, @o_job, @o_salary, @o_dc, @o_sd, @o_so, @o_status, @o_msg);
+    SELECT @o_status AS status, @o_msg AS message;
+
 -- =============================================
 -- PROCEDIMIENTO 2: ACTUALIZAR STAFF
 -- =============================================
