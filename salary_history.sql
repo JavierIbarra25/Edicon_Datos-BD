@@ -61,3 +61,5 @@ VALUES (10001, 35000, '2024-01-01', '9999-01-01');
 -- Consulta la tabla salary_history
 
 SELECT * FROM salary_history WHERE employee_code = 10001;
+
+
