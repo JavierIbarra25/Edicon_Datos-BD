@@ -3,6 +3,11 @@ DROP DATABASE IF EXISTS employees_test;
 CREATE DATABASE employees_test;
 USE employees_test;
 
+-- Ejecutar esto para crear las tablas con la misma estructura que en `employees`
+-- Puedes usar mysqldump o directamente:
+-- En terminal:
+-- mysqldump -d employees | mysql employees_test
+
 -- 2. Crear estructura de tablas
 CREATE TABLE departments (
     dept_no     CHAR(4)         NOT NULL,
