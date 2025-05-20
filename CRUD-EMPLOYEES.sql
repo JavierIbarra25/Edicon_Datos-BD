@@ -7,7 +7,8 @@ DELIMITER $$
 -- =============================================
 -- PROCEDIMIENTO 1: INSERTAR STAFF
 -- =============================================
-CREATE PROCEDURE insertar_staff (
+DROP PROCEDURE IF EXISTS insertar_staff $$
+CREATE PROCEDURE insertar_staff(
     IN p_employee_code SMALLINT UNSIGNED,
     IN p_name VARCHAR(25),
     IN p_job VARCHAR(25),
@@ -90,7 +91,8 @@ proc_insert:BEGIN
         VALUES (p_employee_code, p_name, p_job, p_salary, p_department_code, p_start_date, p_superior_officer);
 
         -- Recuperar los datos recién insertados (incluyendo posibles cambios por triggers)
-        SELECT s* INTO o_employee_code, o_name, o_job, o_salary, o_department_code, o_start_date, o_superior_officer
+        SELECT Employee_Code, Name, Job, Salary, Department_Code, Start_Date, Superior_Officer
+        INTO o_employee_code, o_name, o_job, o_salary, o_department_code, o_start_date, o_superior_officer
         FROM staff 
         WHERE s.Employee_Code = p_employee_code;
     
@@ -119,6 +121,7 @@ END$$
 -- =============================================
 -- PROCEDIMIENTO 2: ACTUALIZAR STAFF
 -- =============================================
+DROP PROCEDURE IF EXISTS actualizar_staff $$
 CREATE PROCEDURE actualizar_staff (
     IN p_employee_code SMALLINT UNSIGNED,
     IN p_name VARCHAR(25),
@@ -152,13 +155,15 @@ proc_update:BEGIN
         LEAVE proc_update;
     END IF;
 
-    -- Comprobar existencia
-    IF NOT EXISTS (SELECT 1 FROM staff WHERE Employee_Code = p_employee_code) THEN
-        SET o_status = 1;
-        SET o_error_message = 'Error: Staff no encontrado';
-        LEAVE proc_update;
+    -- Fecha de inicio
+    IF p_start_date IS NULL THEN
+        SET p_start_date = CURDATE();
     END IF;
 
+    -- Transacción con aislamiento READ COMMITTED para evitar lecturas sucias
+    SET TRANSACTION ISOLATION LEVEL READ COMMITTED;
+    START TRANSACTION;
+    
     -- Ajuste de salario
     IF p_salary IS NULL THEN
         SET p_salary = (SELECT AVG(Salary) FROM staff);
@@ -169,11 +174,18 @@ proc_update:BEGIN
         SET p_salary = (SELECT MIN(Salary) FROM staff);
     END IF;
 
+    -- Comprobar existencia
+    IF NOT EXISTS (SELECT 1 FROM staff WHERE Employee_Code = p_employee_code) THEN
+        SET o_status = 1;
+        SET o_error_message = 'Error: Empleado no encontrado';
+        LEAVE proc_update;
+    END IF;
+
     -- Validar Department_Code
     IF p_department_code IS NOT NULL
        AND NOT EXISTS (SELECT 1 FROM department WHERE Department_Code = p_department_code) THEN
         SET o_status = 4;
-        SET o_error_message = 'Error: Department_Code no es válido';
+        SET o_error_message = 'Error: Departamento no existe';
         LEAVE proc_update;
     END IF;
 
@@ -182,18 +194,10 @@ proc_update:BEGIN
         SET p_superior_officer = p_employee_code;
     ELSEIF NOT EXISTS (SELECT 1 FROM staff WHERE Employee_Code = p_superior_officer) THEN
         SET o_status = 3;
-        SET o_error_message = 'Error: Superior_Officer no es válido';
+        SET o_error_message = 'Error: Superior Officer no existe';
         LEAVE proc_update;
     END IF;
-
-    -- Fecha de inicio
-    IF p_start_date IS NULL THEN
-        SET p_start_date = CURDATE();
-    END IF;
-
-    -- Transacción con aislamiento READ COMMITTED para evitar lecturas sucias
-    SET TRANSACTION ISOLATION LEVEL READ COMMITTED;
-    START TRANSACTION;
+    
         UPDATE staff
         SET Name = p_name,
             Job = p_job,
