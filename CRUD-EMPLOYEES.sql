@@ -199,14 +199,15 @@ proc_update:BEGIN
     END IF;
     
         UPDATE staff
-        SET Name = p_name,
-            Job = p_job,
-            Salary = p_salary,
-            Department_Code = p_department_code,
-            Start_Date = p_start_date,
-            Superior_Officer = p_superior_officer
+        SET Name = p_name, Job = p_job, Salary = p_salary, Department_Code = p_department_code, Start_Date = p_start_date, Superior_Officer = p_superior_officer
         WHERE Employee_Code = p_employee_code;
     COMMIT;
+
+    -- Recuperar los datos recién insertados (incluyendo posibles cambios por triggers)
+        SELECT Employee_Code, Name, Job, Salary, Department_Code, Start_Date, Superior_Officer
+        INTO o_employee_code, o_name, o_job, o_salary, o_department_code, o_start_date, o_superior_officer
+        FROM staff 
+        WHERE Employee_Code = p_employee_code;
 
     -- Devolver datos actualizados
     SET o_employee_code = p_employee_code;
@@ -257,15 +258,16 @@ proc_delete:BEGIN
         LEAVE proc_delete;
     END IF;
 
-    -- Obtener datos antes de eliminar
+    -- Transacción con aislamiento SERIALIZABLE para evitar condiciones de carrera
+    SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;
+    START TRANSACTION;
+
+        -- Obtener datos antes de eliminar
     SELECT Employee_Code, Name, Job, Salary, Department_Code, Start_Date, Superior_Officer
     INTO o_employee_code, o_name, o_job, o_salary, o_department_code, o_start_date, o_superior_officer
     FROM staff
     WHERE Employee_Code = p_employee_code;
 
-    -- Transacción con aislamiento SERIALIZABLE para evitar condiciones de carrera
-    SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;
-    START TRANSACTION;
         DELETE FROM staff WHERE Employee_Code = p_employee_code;
     COMMIT;
 
