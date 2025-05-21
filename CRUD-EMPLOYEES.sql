@@ -34,6 +34,14 @@ proc_insert:BEGIN
         ROLLBACK;
     END;
 
+    -- Insercción duplicada
+    IF EXISTS (SELECT 1 FROM staff WHERE Employee_Code = p_employee_code) THEN
+        SET o_status = 1;
+        SET o_error_message = 'Error: Inserción duplicada';
+        ROLLBACK; -- fin transacción
+        LEAVE proc_insert;
+    END IF;
+
     -- Validaciones iniciales
     IF p_employee_code IS NULL OR p_name IS NULL OR p_job IS NULL THEN
         SET o_status = 2;
@@ -58,14 +66,6 @@ proc_insert:BEGIN
         SET p_salary = (SELECT MAX(Salary) FROM staff);
     ELSEIF p_salary < (SELECT MIN(Salary) FROM staff) THEN
         SET p_salary = (SELECT MIN(Salary) FROM staff);
-    END IF;
-
-    -- Insercción duplicada
-    IF EXISTS (SELECT 1 FROM staff WHERE Employee_Code = p_employee_code) THEN
-        SET o_status = 1;
-        SET o_error_message = 'Error: Inserción duplicada';
-        ROLLBACK; -- fin transacción
-        LEAVE proc_insert;
     END IF;
 
     -- Validar Department_Code
