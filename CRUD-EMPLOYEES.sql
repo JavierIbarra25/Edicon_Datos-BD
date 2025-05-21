@@ -94,7 +94,7 @@ proc_insert:BEGIN
         SELECT Employee_Code, Name, Job, Salary, Department_Code, Start_Date, Superior_Officer
         INTO o_employee_code, o_name, o_job, o_salary, o_department_code, o_start_date, o_superior_officer
         FROM staff 
-        WHERE s.Employee_Code = p_employee_code;
+        WHERE Employee_Code = p_employee_code;
     
     COMMIT;
 
